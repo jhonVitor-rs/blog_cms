@@ -10,6 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@radix-ui/react-tabs": "^1.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
