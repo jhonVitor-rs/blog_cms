@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1762809494293,
+      "tag": "0000_aromatic_ghost_rider",
+      "breakpoints": true
+    }
+  ]
+}
