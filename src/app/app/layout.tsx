@@ -29,7 +29,7 @@ export default function AppLayout({
   const pathname = usePathname();
 
   return (
-    <main className="relative min-h-screen w-full flex flex-col">
+    <main className="relative min-h-screen w-full flex flex-col bg-muted">
       <header className="bg-primary text-primary-foreground w-full border-b">
         <div className="container mx-auto px-4">
           {/* Logo/Title */}
