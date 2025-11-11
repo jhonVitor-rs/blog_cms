@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { bigint, integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { articles } from "./articles";
 import { users } from "./user";
 
@@ -9,6 +9,8 @@ export const images = pgTable("images", {
     .$defaultFn(() => crypto.randomUUID()),
   url: text("url").notNull(),
   index: integer("index").notNull(),
+  orignalName: varchar("original_name", {length: 255}).notNull(),
+  size: bigint("size", { mode: "number" }).notNull(),
   articleId: text("article_id").references(() => articles.id, {
     onDelete: "cascade"
   }),
