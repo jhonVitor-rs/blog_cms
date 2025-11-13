@@ -11,6 +11,7 @@ export const images = pgTable("images", {
   index: integer("index").notNull(),
   orignalName: varchar("original_name", {length: 255}).notNull(),
   size: bigint("size", { mode: "number" }).notNull(),
+  publicId: text('public_id').notNull(),
   articleId: text("article_id").references(() => articles.id, {
     onDelete: "cascade"
   }),
