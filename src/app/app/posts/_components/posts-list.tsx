@@ -1,6 +1,6 @@
 "use client";
 
-import { Image as LucideImage } from "lucide-react";
+import { Image as LucideImage, Plus } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { TPost } from "@/services/db/schemas";
 import { EmptyList } from "./empty-list";
+import { NewPostForm } from "./new-post-form";
 
 export function PostsList({ posts }: { posts: TPost[] }) {
   const [listPosts, setListPosts] = useState<TPost[]>(posts);
@@ -31,7 +32,7 @@ export function PostsList({ posts }: { posts: TPost[] }) {
         {listPosts.length <= 0 ? (
           <EmptyList />
         ) : (
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="relative w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {listPosts.map((post) => (
               <Card
                 key={post.id}
@@ -58,6 +59,11 @@ export function PostsList({ posts }: { posts: TPost[] }) {
                 </CardFooter>
               </Card>
             ))}
+            <div className="fixed bottom-10 right-10">
+              <NewPostForm className="rounded-lg p-4">
+                <Plus className="size-8" />
+              </NewPostForm>
+            </div>
           </div>
         )}
       </div>
