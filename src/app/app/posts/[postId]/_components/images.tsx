@@ -1,15 +1,11 @@
-/** biome-ignore-all lint/complexity/useOptionalChain: <explanation> */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, GripVertical, Trash2 } from "lucide-react";
+import { GripVertical, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createSwapy } from "swapy";
-import { z } from "zod";
-import { ImageInput } from "@/components/image-input";
+import { ImageForm } from "@/components/image-component";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -18,9 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Form, FormField, FormItem } from "@/components/ui/form";
 import { getUserSession } from "@/lib/auth";
-import { cn } from "@/lib/utils";
 import type { TImage } from "@/services/db/schemas";
 import {
   createArticleImage,
@@ -29,86 +23,6 @@ import {
   updateArticleImage,
   updateImagesIndex,
 } from "../actions";
-import { imageFileSchema } from "./file-schema";
-
-const formSchema = z.object({
-  image: imageFileSchema,
-});
-
-function ImageForm({
-  image,
-  onSave,
-}: {
-  image?: TImage;
-  onSave: (file: File, image?: TImage) => Promise<void>;
-}) {
-  const [previewUrl, setPreviewUrl] = useState(image?.url);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      image: undefined,
-    },
-  });
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl && previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  const handleSubmit = form.handleSubmit(async (data) => {
-    await onSave(data.image, image);
-    clearPreviewUrl();
-  });
-
-  const handlePreviewUrl = (value: string) => {
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl);
-    }
-
-    setPreviewUrl(value);
-  };
-
-  const clearPreviewUrl = () => {
-    if (previewUrl !== image?.url) setPreviewUrl(image?.url);
-    else setPreviewUrl(undefined);
-  };
-
-  return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit} className="relative">
-        <FormField
-          control={form.control}
-          name="image"
-          render={({ field }) => (
-            <FormItem>
-              <ImageInput
-                field={field}
-                url={previewUrl || undefined}
-                clearPreviewUrl={clearPreviewUrl}
-                handlePreviewUrl={handlePreviewUrl}
-                className="w-full"
-              />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          className={cn(
-            previewUrl !== image?.url
-              ? "absolute bottom-8 right-20 hover:scale-110"
-              : "hidden"
-          )}
-          size={"icon"}
-        >
-          <Check />
-        </Button>
-      </form>
-    </Form>
-  );
-}
 
 export function ArticleImages({ articleId }: { articleId: string }) {
   const [images, setImages] = useState<TImage[]>([]);
