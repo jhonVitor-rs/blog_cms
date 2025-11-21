@@ -18,6 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { CardFooter } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { TArticle, TNewArticle } from "@/services/db/schemas";
+import { ArticleImages } from "./images";
 
 const articleSchema = z.object({
   title: z
@@ -88,7 +90,7 @@ export function Article({
     <Collapsible
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="border rounded-lg mb-2"
+      className="border rounded-lg mb-2 bg-background"
     >
       <div className="flex items-center justify-between gap-4 px-4 py-2">
         <h4 className="text-sm font-semibold">
@@ -186,6 +188,11 @@ export function Article({
             </div>
           </form>
         </Form>
+        <CardFooter>
+          {"id" in article && article.id && (
+            <ArticleImages articleId={article.id} />
+          )}
+        </CardFooter>
       </CollapsibleContent>
     </Collapsible>
   );

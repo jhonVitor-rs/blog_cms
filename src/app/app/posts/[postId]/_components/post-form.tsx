@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { type TPostWithRelations, updatePost } from "../actions";
+import type { TPost } from "@/services/db/schemas";
+import { updatePost } from "../actions";
 import { imageFileSchema } from "./file-schema";
 
 const postSchema = z.object({
@@ -29,7 +30,7 @@ const postSchema = z.object({
   banner: imageFileSchema.optional(),
 });
 
-export function PostForm({ post }: { post: TPostWithRelations }) {
+export function PostForm({ post }: { post: TPost }) {
   const [previewUrl, setPreviewUrl] = useState(post.banner);
   const form = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),

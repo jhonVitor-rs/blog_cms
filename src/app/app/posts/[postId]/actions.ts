@@ -9,6 +9,7 @@ import {
   images,
   posts,
   type TArticle,
+  type TImage,
   type TNewArticle,
   type TPost,
 } from "@/services/db/schemas";
@@ -18,16 +19,6 @@ export async function getPost(postId: string) {
   try {
     const post = await db.query.posts.findFirst({
       where: eq(posts.id, postId),
-      with: {
-        articles: {
-          orderBy: [asc(articles.index)],
-          with: {
-            images: {
-              orderBy: [asc(images.index)],
-            },
-          },
-        },
-      },
     });
 
     return post ?? null;
@@ -37,9 +28,29 @@ export async function getPost(postId: string) {
   }
 }
 
-export type TPostWithRelations = NonNullable<
-  Awaited<ReturnType<typeof getPost>>
->;
+export async function getArticlesPost(postId: string) {
+  try {
+    return await db.query.articles.findMany({
+      where: eq(articles.postId, postId),
+      orderBy: asc(articles.index),
+    });
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export async function getImagesArticle(articleId: string) {
+  try {
+    return await db.query.images.findMany({
+      where: eq(images.articleId, articleId),
+      orderBy: asc(images.index),
+    });
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
 
 export async function updatePost(
   postId: string,
@@ -247,6 +258,154 @@ export async function deleteArticle(id: string): Promise<Response<null>> {
     return {
       success: false,
       message: "Falha ao excluir artigo",
+    };
+  }
+}
+
+export async function createArticleImage(
+  userId: string,
+  articleId: string,
+  file: File,
+  index: number,
+): Promise<Response<TImage>> {
+  try {
+    const uploadedImage = await uploadImage(
+      file,
+      `articles/${articleId}/images`,
+    );
+    const [image] = await db
+      .insert(images)
+      .values({
+        url: uploadedImage.secure_url,
+        publicId: uploadedImage.public_id,
+        index,
+        articleId,
+        userId,
+        size: file.size,
+        orignalName: file.name,
+      })
+      .returning();
+
+    return {
+      success: true,
+      message: "",
+      data: image,
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      message: "Falha ao adicionar imagem",
+    };
+  }
+}
+
+export async function deleteArticleImage(
+  imageid: string,
+): Promise<Response<null>> {
+  try {
+    const image = await db.query.images.findFirst({
+      where: eq(images.id, imageid),
+    });
+    if (!image) {
+      return {
+        success: false,
+        message: "Imagem não encontrada",
+      };
+    }
+
+    await deleteImage(image.publicId);
+    await db.delete(images).where(eq(images.id, imageid));
+
+    return {
+      success: true,
+      message: "imagen removidao com sucesso",
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      message: "Falha ao remover imagen",
+    };
+  }
+}
+
+export async function updateArticleImage(
+  imageId: string,
+  file: File,
+): Promise<Response<TImage>> {
+  try {
+    const image = await db.query.images.findFirst({
+      where: eq(images.id, imageId),
+    });
+    if (!image) {
+      return {
+        success: false,
+        message: "IMagem não encontrada",
+      };
+    }
+
+    const uploadedImageFile = await uploadImage(
+      file,
+      `article/${image.articleId}/images`,
+    );
+    await deleteImage(image.publicId);
+
+    const [updatedImage] = await db
+      .update(images)
+      .set({
+        url: uploadedImageFile.secure_url,
+        publicId: uploadedImageFile.public_id,
+        size: file.size,
+        orignalName: file.name,
+        updatedAt: new Date(),
+      })
+      .where(eq(images.id, imageId))
+      .returning();
+
+    return {
+      success: true,
+      message: "",
+      data: updatedImage,
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      message: "Falha ao atualizar imagem",
+    };
+  }
+}
+
+export async function updateImagesIndex(
+  imagesData: { id: string; index: number }[],
+): Promise<Response<null>> {
+  try {
+    await db.transaction(async (tx) => {
+      for (const image of imagesData) {
+        await tx
+          .update(images)
+          .set({
+            index: image.index,
+            updatedAt: new Date(),
+          })
+          .where(eq(images.id, image.id));
+      }
+    });
+
+    return {
+      success: true,
+      message: "",
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      message: "Falha ao tentar atualizar ordem das imagens",
     };
   }
 }
