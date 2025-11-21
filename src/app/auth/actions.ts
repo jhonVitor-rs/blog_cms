@@ -14,7 +14,12 @@ export async function register(
 
     const [newUser] = await db
       .insert(users)
-      .values({ name: data.name, email: data.email, password: hashPassword })
+      .values({
+        name: data.name,
+        email: data.email,
+        password: hashPassword,
+        key: crypto.randomUUID()
+      })
       .returning({ id: users.id });
 
     return {
@@ -52,7 +57,7 @@ export async function login(
         message: "Email/senha inválido(s)",
       };
 
-    const isValid = await argon2.verify(password, user.password);
+    const isValid = await argon2.verify(user.password, password);
     if (!isValid)
       return {
         success: false,

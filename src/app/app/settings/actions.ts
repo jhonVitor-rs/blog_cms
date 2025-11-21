@@ -72,7 +72,7 @@ export async function updatePassword(
       };
     }
 
-    const isPasswordValid = await argon2.verify(currentPassword, user.password);
+    const isPasswordValid = await argon2.verify(user.password, currentPassword);
     if (!isPasswordValid) {
       return {
         success: false,
@@ -115,7 +115,7 @@ export async function deleteUserAccount(password: string): Promise<Response<null
       };
     }
 
-    const isPasswordValid = await argon2.verify(password, user.password);
+    const isPasswordValid = await argon2.verify(user.password, password);
     if (!isPasswordValid) {
       return {
         success: false,
@@ -135,6 +135,37 @@ export async function deleteUserAccount(password: string): Promise<Response<null
     return {
       success: false,
       message: "Erro ao deletar a conta"
+    }
+  }
+}
+
+export async function generateUserKey(): Promise<Response<string>> {
+  try {
+    const userSession = await getUserSession()
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userSession.id),
+    });
+    if (!user) {
+      return {
+        success: false,
+        message: "Usuário não encontrado.",
+      };
+    }
+
+    const newKey = crypto.randomUUID();
+    await db.update(users).set({key: newKey, updatedAt: new Date()}).where(eq(users.id, user.id))
+
+    return {
+      success: true,
+      message: "Chave atualizada com sucesso",
+      data: newKey
+    }
+  } catch (error) {
+    console.error(error)
+
+    return {
+      success: false,
+      message: "Erro ao gerar nova chave"
     }
   }
 }
