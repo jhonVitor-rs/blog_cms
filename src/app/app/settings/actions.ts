@@ -4,6 +4,7 @@ import argon2 from "argon2";
 import { eq } from "drizzle-orm";
 import { getUserSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { generateApiKey, saveKeyInCookie } from "@/services/api/gen-key";
 import { type TUser, users } from "@/services/db/schemas";
 import type { Response } from "@/types/response";
 
@@ -101,7 +102,9 @@ export async function updatePassword(
   }
 }
 
-export async function deleteUserAccount(password: string): Promise<Response<null>> {
+export async function deleteUserAccount(
+  password: string,
+): Promise<Response<null>> {
   try {
     const userSession = await getUserSession();
 
@@ -123,25 +126,25 @@ export async function deleteUserAccount(password: string): Promise<Response<null
       };
     }
 
-    await db.delete(users).where(eq(users.id, user.id))
+    await db.delete(users).where(eq(users.id, user.id));
 
     return {
       success: true,
-      message: "Conta deletada com sucesso"
-    }
+      message: "Conta deletada com sucesso",
+    };
   } catch (error) {
-    console.error(error)
+    console.error(error);
 
     return {
       success: false,
-      message: "Erro ao deletar a conta"
-    }
+      message: "Erro ao deletar a conta",
+    };
   }
 }
 
 export async function generateUserKey(): Promise<Response<string>> {
   try {
-    const userSession = await getUserSession()
+    const userSession = await getUserSession();
     const user = await db.query.users.findFirst({
       where: eq(users.id, userSession.id),
     });
@@ -152,20 +155,24 @@ export async function generateUserKey(): Promise<Response<string>> {
       };
     }
 
-    const newKey = crypto.randomUUID();
-    await db.update(users).set({key: newKey, updatedAt: new Date()}).where(eq(users.id, user.id))
+    const { rawKey, hashed } = await generateApiKey();
+    await db
+      .update(users)
+      .set({ key: hashed, updatedAt: new Date() })
+      .where(eq(users.id, user.id));
+    await saveKeyInCookie(rawKey);
 
     return {
       success: true,
       message: "Chave atualizada com sucesso",
-      data: newKey
-    }
+      data: rawKey,
+    };
   } catch (error) {
-    console.error(error)
+    console.error(error);
 
     return {
       success: false,
-      message: "Erro ao gerar nova chave"
-    }
+      message: "Erro ao gerar nova chave",
+    };
   }
 }

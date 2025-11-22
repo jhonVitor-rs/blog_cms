@@ -1,12 +1,12 @@
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { validateApiKey } from "@/services/api/gen-key";
-import { articles, images, posts } from "@/services/db/schemas";
+import { images } from "@/services/db/schemas";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { postId: string } },
+  { params }: { params: { imageId: string } },
 ) {
   try {
     const authorization = req.headers.get("authorization") ?? "";
@@ -23,25 +23,14 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const post = await db.query.posts.findFirst({
-      where: eq(posts.id, params.postId),
-      with: {
-        articles: {
-          with: {
-            images: {
-              orderBy: [asc(images.index)],
-            },
-          },
-          orderBy: [asc(articles.index)],
-        },
-      },
+    const image = await db.query.images.findFirst({
+      where: eq(images.id, params.imageId),
     });
-
-    if (!post) {
+    if (!image) {
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    return NextResponse.json(post);
+    return NextResponse.json(image);
   } catch (error) {
     console.error("API error:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

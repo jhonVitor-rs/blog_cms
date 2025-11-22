@@ -2,25 +2,31 @@
 
 import argon2 from "argon2";
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { generateApiKey, saveKeyInCookie } from "@/services/api/gen-key";
 import { type TNewUser, users } from "@/services/db/schemas";
 import type { Response } from "@/types/response";
 
-export async function register(
-  data: TNewUser,
-): Promise<Response<{ userId: string }>> {
+export async function register(data: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<Response<{ userId: string }>> {
   try {
     const hashPassword = await argon2.hash(data.password);
+    const { rawKey, hashed } = await generateApiKey();
 
     const [newUser] = await db
       .insert(users)
       .values({
-        name: data.name,
-        email: data.email,
+        ...data,
         password: hashPassword,
-        key: crypto.randomUUID()
+        key: hashed,
       })
       .returning({ id: users.id });
+
+    await saveKeyInCookie(rawKey);
 
     return {
       success: true,

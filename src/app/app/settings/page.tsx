@@ -20,7 +20,7 @@ export default async function SettingsPage() {
           <UserForm user={user} />
           <UpdatePassword />
         </div>
-        <AccountSettings currentKey={user.key || ""} />
+        <AccountSettings />
         <DeleteAccount />
       </Suspense>
     </div>

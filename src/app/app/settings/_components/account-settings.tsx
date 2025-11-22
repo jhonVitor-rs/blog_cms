@@ -1,7 +1,8 @@
 /** biome-ignore-all lint/a11y/noLabelWithoutControl: <explanation> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 "use client";
 import { Check, Copy, LogOut, RefreshCcw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -22,12 +23,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getApiKey } from "@/services/api/gen-key";
 import { generateUserKey } from "../actions";
 
-export function AccountSettings({ currentKey }: { currentKey: string }) {
-  const [key, setKey] = useState(currentKey);
+export function AccountSettings() {
+  const [key, setKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
+  const fetchApiKey = async () => {
+    setIsLoading(true);
+    const apiKey = await getApiKey();
+    setKey(apiKey);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchApiKey();
+  }, []);
 
   const handleUpdateKey = async () => {
     setIsLoading(true);
