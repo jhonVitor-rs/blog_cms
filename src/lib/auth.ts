@@ -1,5 +1,17 @@
 "use server"
 
+import { auth, signOut } from "@/services/auth"
+
 export async function getUserSession() {
-  return {id: "77904a25-ff07-4be2-b865-1d9a2efe34fd"}
+  const userSession = await auth()
+
+  if (!userSession?.user || !userSession.user.id) {
+    return signOut()
+  }
+
+  return userSession.user
+}
+
+export async function logout() {
+  return await signOut()
 }

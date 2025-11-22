@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -30,6 +31,7 @@ const loginSchema = z.object({
 });
 
 export function Login() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -43,6 +45,7 @@ export function Login() {
 
     if (success) {
       toast.success(message);
+      router.push("/app/posts");
     } else {
       toast.error(message);
     }

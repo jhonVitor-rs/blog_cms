@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { generateApiKey, saveKeyInCookie } from "@/services/api/gen-key";
+import { signIn } from "@/services/auth";
 import { type TNewUser, users } from "@/services/db/schemas";
 import type { Response } from "@/types/response";
 
@@ -27,11 +28,11 @@ export async function register(data: {
       .returning({ id: users.id });
 
     await saveKeyInCookie(rawKey);
+    await signIn("credentials", {email: data.email, password: data.password})
 
     return {
       success: true,
       message: "Usuário criado com sucesso",
-      data: { userId: newUser.id },
     };
   } catch (error) {
     console.error("Erro ao registrar usuário:", error);
@@ -54,21 +55,7 @@ export async function login(
   password: string,
 ): Promise<Response> {
   try {
-    const user = await db.query.users
-      .findFirst({ where: eq(users.email, email) })
-      .execute();
-    if (!user)
-      return {
-        success: false,
-        message: "Email/senha inválido(s)",
-      };
-
-    const isValid = await argon2.verify(user.password, password);
-    if (!isValid)
-      return {
-        success: false,
-        message: "Email/senha inválido(s)",
-      };
+    await signIn("credentials", { email, password });
 
     return {
       success: true,

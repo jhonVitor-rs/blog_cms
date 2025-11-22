@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -38,7 +39,7 @@ const registerSchema = z
       .max(100, "Senha deve ter no máximo 100 caracteres")
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número"
+        "Senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número",
       ),
     confirmPassword: z
       .string({ error: "Confirmação de senha é obrigatória" })
@@ -50,6 +51,7 @@ const registerSchema = z
   });
 
 export function Register() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -61,18 +63,14 @@ export function Register() {
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    const {
-      success,
-      message,
-      data: resData,
-    } = await register({
+    const { success, message } = await register({
       name: data.name,
       email: data.email,
       password: data.password,
     });
-    console.log(resData);
     if (success) {
       toast.success(message);
+      router.push("/app/posts");
     } else {
       toast.error(message);
     }

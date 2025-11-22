@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { UrlMenu } from "@/components/url-menu";
 import type { TPost } from "@/services/db/schemas";
 import { EmptyList } from "./empty-list";
 import { NewPostForm } from "./new-post-form";
@@ -56,6 +57,7 @@ export function PostsList({ posts }: { posts: TPost[] }) {
                   <CardTitle className="text-foreground drop-shadow-lg">
                     {post.title}
                   </CardTitle>
+                  <UrlMenu url={`posts/${post.id}`} />
                 </CardFooter>
               </Card>
             ))}

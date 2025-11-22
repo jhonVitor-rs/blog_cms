@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ImageForm } from "@/components/image-component";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { UrlMenu } from "@/components/url-menu";
 import type { TImage } from "@/services/db/schemas";
 import {
   createUserImage,
@@ -130,14 +131,17 @@ export function ImagesList({ data }: { data: TUserImagesData }) {
                 <div className="relative h-full">
                   <ImageForm image={image} onSave={handleUpdate} />
 
-                  <Button
-                    variant={"destructive"}
-                    size={"icon"}
-                    className="absolute bottom-11 right-8 hover:scale-110 transition-transform"
-                    onClick={() => handleDeleteImage(image.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="absolute bottom-11 right-8 flex items-center gap-4">
+                    <UrlMenu url={`images/${image.id}`} />
+                    <Button
+                      variant={"destructive"}
+                      size={"icon"}
+                      className="hover:scale-110 transition-transform"
+                      onClick={() => handleDeleteImage(image.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}

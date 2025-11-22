@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { logout } from "@/lib/auth";
 import { getApiKey } from "@/services/api/gen-key";
 import { generateUserKey } from "../actions";
 
@@ -69,8 +70,7 @@ export function AccountSettings() {
   };
 
   const handleLogout = async () => {
-    // Chamar sua action de logout aqui
-    console.log("Fazendo logout...");
+    await logout();
     toast.success("Você foi desconectado!");
   };
 
