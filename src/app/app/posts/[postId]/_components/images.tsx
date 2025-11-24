@@ -80,7 +80,7 @@ export function ArticleImages({ articleId }: { articleId: string }) {
   const handleCreateNew = async (file: File) => {
     const user = await getUserSession();
     const { success, message, data } = await createArticleImage(
-      user.id,
+      user.id as string,
       articleId,
       file,
       images.length

@@ -16,10 +16,10 @@ export async function getUserImages() {
       totalSize: sql<number>`sum(${images.size})`,
     })
     .from(images)
-    .where(eq(images.userId, user.id));
+    .where(eq(images.userId, user.id as string));
 
   const imagesData = await db.query.images.findMany({
-    where: eq(images.userId, user.id),
+    where: eq(images.userId, user.id as string),
     orderBy: asc(images.createdAt),
   });
 
@@ -47,7 +47,7 @@ export async function createUserImage(
         url: uploadedImage.secure_url,
         publicId: uploadedImage.public_id,
         index,
-        userId: user.id,
+        userId: user.id as string,
         size: file.size,
         orignalName: file.name,
       })

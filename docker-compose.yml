@@ -3,8 +3,8 @@ version: '3.8'
 services:
   db:
     image: postgres:17.5-alpine3.21
-    container_name: db
-    attach: false
+    container_name: posts_db
+    restart: unless-stopped
     ports:
       - '5432:5432'
     volumes:
@@ -13,6 +13,36 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
       POSTGRES_DB: posts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: next_app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/posts
+      CLOUDINARY_CLOUD_NAME: dnj2yvav4
+      CLOUDINARY_API_KEY: 149649658658846
+      CLOUDINARY_API_SECRET: LiR3d_c29O6KAE5yGtELWdOkZ64
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      AUTH_SECRET: B/d2a48/my9uGKQP80yWw1FfQc8ekKy7SWzErfH5iFw=
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: sh -c "npx drizzle-kit push && npm run dev"
 
 volumes:
   postgres_data:

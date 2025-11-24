@@ -61,7 +61,7 @@ export function NewPostForm({
       success,
       message,
       data: resData,
-    } = await createPost({ title: data.title, userId: user.id });
+    } = await createPost({ title: data.title, userId: user.id as string });
 
     if (success) {
       toast.success(message);

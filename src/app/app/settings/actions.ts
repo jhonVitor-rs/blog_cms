@@ -12,7 +12,7 @@ export async function getUser() {
   const user = await getUserSession();
 
   const userData = db.query.users.findFirst({
-    where: eq(users.id, user.id),
+    where: eq(users.id, user.id as string),
   });
 
   return userData;
@@ -26,7 +26,7 @@ export async function updateUserData(
     const userSession = await getUserSession();
 
     const user = await db.query.users.findFirst({
-      where: eq(users.id, userSession.id),
+      where: eq(users.id, userSession.id as string),
     });
     if (!user) {
       return {
@@ -64,7 +64,7 @@ export async function updatePassword(
     const userSession = await getUserSession();
 
     const user = await db.query.users.findFirst({
-      where: eq(users.id, userSession.id),
+      where: eq(users.id, userSession.id as string),
     });
     if (!user) {
       return {
@@ -109,7 +109,7 @@ export async function deleteUserAccount(
     const userSession = await getUserSession();
 
     const user = await db.query.users.findFirst({
-      where: eq(users.id, userSession.id),
+      where: eq(users.id, userSession.id as string),
     });
     if (!user) {
       return {
@@ -146,7 +146,7 @@ export async function generateUserKey(): Promise<Response<string>> {
   try {
     const userSession = await getUserSession();
     const user = await db.query.users.findFirst({
-      where: eq(users.id, userSession.id),
+      where: eq(users.id, userSession.id as string),
     });
     if (!user) {
       return {

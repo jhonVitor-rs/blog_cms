@@ -1,15 +1,18 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { getUserSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { posts, type TNewPost } from "@/services/db/schemas";
 import type { Response } from "@/types/response";
 
-export async function getAllPosts(userId: string) {
+export async function getAllPosts() {
+  const user = await getUserSession();
+
   return await db
     .select()
     .from(posts)
-    .where(eq(posts.userId, userId))
+    .where(eq(posts.userId, user.id as string))
     .orderBy(posts.updatedAt);
 }
 
