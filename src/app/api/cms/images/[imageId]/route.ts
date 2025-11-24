@@ -6,13 +6,13 @@ import { images } from "@/services/db/schemas";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { imageId: string } },
+  { params }: { params: Promise<{ imageId: string }> },
 ) {
   try {
     const authorization = req.headers.get("authorization") ?? "";
-    const apiKey = authorization.startsWith("Bearer ")
-      ? authorization.slice(7)
-      : null;
+    const matches = authorization.match(/^"?Bearer (.+?)"?$/);
+
+    const apiKey = matches ? matches[1] : null;
 
     if (!apiKey) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -23,8 +23,11 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const paramsData = await params
+    const imageId = paramsData.imageId
+
     const image = await db.query.images.findFirst({
-      where: eq(images.id, params.imageId),
+      where: eq(images.id, imageId),
     });
     if (!image) {
       return new NextResponse("Not Found", { status: 404 });

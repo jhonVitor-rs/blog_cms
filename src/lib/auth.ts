@@ -5,7 +5,7 @@ import { auth, signOut } from "@/services/auth"
 export async function getUserSession() {
   const userSession = await auth()
 
-  if (!userSession?.user || !userSession.user.id) {
+  if (!userSession?.user?.id) {
     return signOut()
   }
 

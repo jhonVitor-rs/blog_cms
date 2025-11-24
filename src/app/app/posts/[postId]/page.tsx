@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { Button } from "@/components/ui/button";
 import { ArticlesList } from "./_components/articles-list";
+import { LinkHeader } from "./_components/link-header";
 import { PostForm } from "./_components/post-form";
 import { getArticlesPost, getPost } from "./actions";
 
@@ -23,15 +24,18 @@ export default async function PostPage({
 
   return (
     <div className="container relative max-w-5xl m-auto space-y-4">
-      <Link href="/app/posts" className="sm:absolute left-[-40] top-3">
-        <Button
-          size={"icon"}
-          variant={"outline"}
-          className="cursor-pointer rounded-full"
-        >
-          <ChevronLeft />
-        </Button>
-      </Link>
+      <div className="flex items-center gap-4">
+        <Link href="/app/posts" className="">
+          <Button
+            size={"icon"}
+            variant={"outline"}
+            className="cursor-pointer rounded-full"
+          >
+            <ChevronLeft />
+          </Button>
+        </Link>
+        <LinkHeader postId={post.id} />
+      </div>
       <Suspense fallback={<LoadingSpinner />}>
         <PostForm post={post} />
         <ArticlesList postId={post.id} articles={articles} />

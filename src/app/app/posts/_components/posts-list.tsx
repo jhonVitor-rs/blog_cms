@@ -53,8 +53,8 @@ export function PostsList({ posts }: { posts: TPost[] }) {
                     <LucideImage className="w-16 h-16 text-muted-foreground" />
                   )}
                 </CardContent>
-                <CardFooter className="absolute inset-x-0 bottom-0 p-4 bg-linear-to-t from-background via-background/80 to-transparent">
-                  <CardTitle className="text-foreground drop-shadow-lg">
+                <CardFooter className="absolute gap-4 inset-x-0 bottom-0 p-4 bg-linear-to-t from-background via-background/80 to-transparent">
+                  <CardTitle className="text-foreground drop-shadow-lg flex-1">
                     {post.title}
                   </CardTitle>
                   <UrlMenu url={`posts/${post.id}`} />

@@ -4,7 +4,7 @@ import { getAllPosts } from "./actions";
 
 export default async function PostsPage() {
   const user = await getUserSession();
-  const posts = await getAllPosts(user.id);
+  const posts = await getAllPosts(user.id as string);
 
   return (
     <main className="m-auto">

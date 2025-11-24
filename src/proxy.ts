@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getUrl } from "./lib/get-url";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("authjs.session-token");
   const pathname = request.nextUrl.pathname;
 
@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
   }
 
   if ((pathname === "/auth" || pathname === "/") && token) {
-    return NextResponse.redirect(new URL(getUrl("/app")));
+    return NextResponse.redirect(new URL(getUrl("/app/posts")));
   }
 }
 

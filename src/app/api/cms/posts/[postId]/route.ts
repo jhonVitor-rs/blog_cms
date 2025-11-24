@@ -6,13 +6,13 @@ import { articles, images, posts } from "@/services/db/schemas";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { postId: string } },
+  { params }: { params: Promise<{ postId: string }> },
 ) {
   try {
     const authorization = req.headers.get("authorization") ?? "";
-    const apiKey = authorization.startsWith("Bearer ")
-      ? authorization.slice(7)
-      : null;
+    const matches = authorization.match(/^"?Bearer (.+?)"?$/);
+
+    const apiKey = matches ? matches[1] : null;
 
     if (!apiKey) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -23,8 +23,11 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const paramsData = await params
+    const postId = paramsData.postId
+
     const post = await db.query.posts.findFirst({
-      where: eq(posts.id, params.postId),
+      where: eq(posts.id, postId),
       with: {
         articles: {
           with: {

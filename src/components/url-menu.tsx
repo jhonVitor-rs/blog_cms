@@ -14,7 +14,9 @@ export function UrlMenu({ url }: { url: string }) {
 
   const handleCopyUrl = async () => {
     try {
-      await navigator.clipboard.writeText(`${process.env.BASE_CMS_URL}${url}`);
+      await navigator.clipboard.writeText(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/cms/${url}`
+      );
       setIsCopied(true);
       toast.success("Chave copiada para a área de transferência!");
       setTimeout(() => setIsCopied(false), 2000);
@@ -25,16 +27,23 @@ export function UrlMenu({ url }: { url: string }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant={"secondary"} size={"icon"} className="rounded-full">
+      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+        <Button
+          size={"icon"}
+          className="rounded-full"
+          onClick={(e) => e.stopPropagation()}
+        >
           <MoreVertical />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem asChild>
-          <Button onClick={handleCopyUrl} variant={"secondary"}>
-            {isCopied ? "Copiada" : "Copiar URL"}
-          </Button>
+      <DropdownMenuContent className="z-50">
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCopyUrl();
+          }}
+        >
+          {isCopied ? "Copiada" : "Copiar URL"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

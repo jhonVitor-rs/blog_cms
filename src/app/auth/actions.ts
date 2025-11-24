@@ -1,12 +1,10 @@
 "use server";
 
 import argon2 from "argon2";
-import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { generateApiKey, saveKeyInCookie } from "@/services/api/gen-key";
 import { signIn } from "@/services/auth";
-import { type TNewUser, users } from "@/services/db/schemas";
+import { users } from "@/services/db/schemas";
 import type { Response } from "@/types/response";
 
 export async function register(data: {
@@ -18,7 +16,7 @@ export async function register(data: {
     const hashPassword = await argon2.hash(data.password);
     const { rawKey, hashed } = await generateApiKey();
 
-    const [newUser] = await db
+    await db
       .insert(users)
       .values({
         ...data,
@@ -28,7 +26,7 @@ export async function register(data: {
       .returning({ id: users.id });
 
     await saveKeyInCookie(rawKey);
-    await signIn("credentials", {email: data.email, password: data.password})
+    await signIn("credentials", {email: data.email, password: data.password, redirect: false})
 
     return {
       success: true,
@@ -55,7 +53,7 @@ export async function login(
   password: string,
 ): Promise<Response> {
   try {
-    await signIn("credentials", { email, password });
+    await signIn("credentials", { email, password, redirect: false });
 
     return {
       success: true,
